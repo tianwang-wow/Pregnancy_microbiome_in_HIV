@@ -449,10 +449,7 @@ for (group_id in 1:3) {
 
 
 
-
-load('./Processed_data/Raw_data_20230320.Rdata') 
-load('./Processed_data/sample_ls_20230424.Rdata') 
-
+### Load raw data
 colnames(Genus_ct_tab)[which(colnames(Genus_ct_tab) == 'Unknown')] = "Other"
 colnames(Genus_abun_tab)[which(colnames(Genus_abun_tab) == 'Unknown')] = "Other"
 
@@ -638,8 +635,6 @@ names(ANCOMBC_fit_ls) = names(ANCOMBC_result_mat_ls) = names(ANCOMBC_meta_ls) = 
     'PP_samples',
     'Infant_samples')
 
-load('./Processed_data/ANCOMBC_FINAL_results_20251121.Rdata') 
-
 c_1_96 = qnorm(0.975)
 current_ANCOM_results_COMBINED_ls = list()
 taxa_structural_zero_ls = list()
@@ -760,8 +755,6 @@ for (set_id in 1:4) {
   
   PERMANOVA_pvalue_mat[, set_id] = c(PM_pvalue, PM_pvalue_model1)
 } 
-
-load('./Processed_data/PERMANOVA_pvalue_mat_20251223.Rdata') 
 
 noquote(dec(PERMANOVA_pvalue_mat, 3)) # Supplementary Table 5
 
@@ -915,10 +908,7 @@ for (set_id in 1:3) {
 } 
 
 
-
-load('./Processed_data/Raw_data_20230320.Rdata') 
-load('./Processed_data/sample_ls_20230424.Rdata') 
-
+### Load raw data
 colnames(Genus_ct_tab)[which(colnames(Genus_ct_tab) == 'Unknown')] = "Other"
 colnames(Genus_abun_tab)[which(colnames(Genus_abun_tab) == 'Unknown')] = "Other"
 
@@ -1003,9 +993,6 @@ chem_to_keep = rownames(chem_annotation)[ which(chem_annotation$missing_rate <= 
 meta_final_full = meta_final 
 meta_final = meta_final[, chem_to_keep] 
 meta_final_METABOLON = meta_final_METABOLON[, chem_to_keep]
-
-load('./Processed_data/meta_data_20231024.RData') 
-
 
 META_pat_vec = rownames(meta_final) 
 n_sam_vec = unlist(sapply(full_long_ls[ META_pat_vec ], nrow)) 
@@ -1205,9 +1192,6 @@ pvalue_mat_ls$Metabolomics = cbind(chem_annotation[rownames(pvalue_mat_ls$Metabo
 pvalue_mat_ls$Microbiome = cbind(rownames(pvalue_mat_ls$Microbiome), 
                                  pvalue_mat_ls$Microbiome)
 colnames(pvalue_mat_ls$Microbiome)[1] = 'Genus'
-
-
-load('./Processed_data/ANCOMBC_results_88_samples_20251118.Rdata') 
 
 
 temp_mat = ancom_model_fit_ls$"Microbiome_pseudo_0.1"$zero_ind 
