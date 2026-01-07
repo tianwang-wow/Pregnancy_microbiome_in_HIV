@@ -100,15 +100,6 @@ alpha_div = alpha_div[Sample_keys$sample_id, ]
 Sample_keys = cbind(Sample_keys, alpha_div) 
 
 
-Meta_data$antibiotic_np 
-Meta_data$antibiotic_ttrim 
-Meta_data$antibiotic = NA 
-Meta_data$antibiotic[ which(Meta_data$antibiotic_ttrim == 'yes') ] = 1
-Meta_data$antibiotic[ which(Meta_data$antibiotic_ttrim == 'no') ] = 0
-Meta_data$antibiotic[ which(Meta_data$antibiotic_np == 'yes') ] = 1
-Meta_data$antibiotic[ which(Meta_data$antibiotic_np == 'no') ] = 0
-Meta_data$antibiotic 
-
 
 Meta_data$education = factor(Meta_data$education, 
                              levels = c('None to primary', 'Middle to high school', 'Post high school to post graduate'))
@@ -116,45 +107,14 @@ Meta_data$post_high_school = NA
 Meta_data$post_high_school[ which(Meta_data$education == 'Post high school to post graduate')] = 1
 Meta_data$post_high_school[ which(Meta_data$education %in% c('None to primary', 'Middle to high school'))] = 0
 
-Meta_data$smoke_ever_01 = NA 
-Meta_data$smoke_ever_01[ which(Meta_data$smoke_ever == 'Yes') ] = 1 
-Meta_data$smoke_ever_01[ which(Meta_data$smoke_ever == 'No') ] = 0
 
-Meta_data$diabetes_gestational_01 = NA 
-Meta_data$diabetes_gestational_01[ which(Meta_data$diabetes_gestational %in% c('diabetes', 'gestational diabetes')) ] = 1
-Meta_data$diabetes_gestational_01[ which(Meta_data$diabetes_gestational %in% c('no')) ] = 0
-table(Meta_data$diabetes_gestational_01)
+Meta_data$muac_6mo_pp = as.numeric(Meta_data$muac_6mo_pp)
 
-Meta_data[ which(Meta_data$anemia_ttrim == 'excluded'), 1:5]
-Meta_data$anemia_ttrim_01 = NA 
-Meta_data$anemia_ttrim_01[ which(Meta_data$anemia_ttrim == 'yes') ] = 1 
-Meta_data$anemia_ttrim_01[ which(Meta_data$anemia_ttrim == 'no') ] = 0
-Meta_data$anemia_ttrim_01[ which(Meta_data$anemia_ttrim == 'excluded') ] = NA
-
-Meta_data$anemia_strim_01 = NA 
-Meta_data$anemia_strim_01[ which(Meta_data$anemia_strim == 'yes') ] = 1 
-Meta_data$anemia_strim_01[ which(Meta_data$anemia_strim == 'no') ] = 0
-Meta_data$anemia_strim_01[ which(Meta_data$anemia_strim == 'excluded') ] = NA
-
-Meta_data$anemia_lnd_01 = NA 
-Meta_data$anemia_lnd_01[ which(Meta_data$anemia_lnd == 'yes') ] = 1 
-Meta_data$anemia_lnd_01[ which(Meta_data$anemia_lnd == 'no') ] = 0
-Meta_data$anemia_lnd_01[ which(Meta_data$anemia_lnd == 'excluded') ] = NA
-
-Meta_data$anemia_np_01 = NA 
-Meta_data$anemia_np_01[ which(Meta_data$anemia_np == 'Yes') ] = 1 
-Meta_data$anemia_np_01[ which(Meta_data$anemia_np == 'No') ] = 0
-
-Meta_data$anemia_np_ttrim_01 = Meta_data$anemia_np_01
-Meta_data$anemia_np_ttrim_01[ which(Meta_data$anemia_ttrim_01 == 1) ] = 1 
-Meta_data$anemia_np_ttrim_01[ which(Meta_data$anemia_ttrim_01 == 0) ] = 0 
-
-Meta_data$muac_6mo_pp = as.numeric(Meta_data$muac_6mo_pp) 
-Meta_data$muac_np = as.numeric(Meta_data$muac_np) 
-Meta_data$muac_lnd = as.numeric(Meta_data$muac_lnd) 
-Meta_data$muac_np_ttrim = Meta_data$muac_np 
-Meta_data$muac_np_ttrim[ !is.na(Meta_data$muacttrim) ] = Meta_data$muacttrim[ !is.na(Meta_data$muacttrim) ] 
-
+Meta_data$muacttrim = as.numeric(Meta_data$muacttrim)
+Meta_data$muacstrim = as.numeric(Meta_data$muacstrim) 
+Meta_data$bmi_zscore_6mo_cat = NA
+Meta_data$bmi_zscore_6mo_cat[ which(Meta_data$bmi_zscore_6mo >= -2)] = 0
+Meta_data$bmi_zscore_6mo_cat[ which(Meta_data$bmi_zscore_6mo < -2)] = 1
 
 sample_ls = list()
 SubjectID = Meta_data$first_half_id 
@@ -640,7 +600,7 @@ current_ANCOM_results_COMBINED_ls = list()
 taxa_structural_zero_ls = list()
 for (set_id in 1:3) { 
   current_ANCOM_results = ANCOMBC_result_mat_ls[[ set_id ]]$ANCOM_with_covariates 
-
+  
   current_ANCOM_results = current_ANCOM_results[, c('taxon', 'lfc_HIV_pos1', 'p_HIV_pos1', 'q_HIV_pos1', 'se_HIV_pos1')] 
   
   current_ANCOM_results$lower_lfc_HIV_pos1 = current_ANCOM_results$lfc_HIV_pos1 - c_1_96 * current_ANCOM_results$se_HIV_pos1
@@ -654,13 +614,13 @@ for (set_id in 1:3) {
                                                       current_ANCOM_results$q_HIV_pos1), ]
   
   current_ANCOM_results_COMBINED_ls[[ set_id ]] = current_ANCOM_results 
-
+  
   
   temp_mat = ANCOMBC_fit_ls[[ set_id ]]$ANCOM_with_covariates$zero_ind 
   tab = table(temp_mat$`structural_zero (HIV_pos = 0)`,
               temp_mat$`structural_zero (HIV_pos = 1)`)
   names(attributes(tab)$dimnames) = c('HIV-', 'HIV+')
-
+  
   taxa_structural_zero = temp_mat[which(temp_mat$`structural_zero (HIV_pos = 0)` + 
                                           temp_mat$`structural_zero (HIV_pos = 1)` == 1), 1:3] 
   taxa_structural_zero = taxa_structural_zero[order(taxa_structural_zero[,2],
@@ -904,7 +864,7 @@ for (set_id in 1:3) {
   } 
   names(model_result_mat_ls)[2] = 'LMM_without_interaction'
   print(model_result_mat_ls$LMM_without_interaction[1, , drop = F])
-
+  
 } 
 
 
@@ -942,23 +902,11 @@ read_excel_allsheets <- function(filename, tibble = FALSE) {
 }
 
 raw_data = read_excel_allsheets('./Raw_data/COLU-05-19VW Data Tables.xlsx')
-raw_data_peak = raw_data$`Peak Area Data`
 raw_data_batch = raw_data$`Batch-normalized Data`
-raw_data_impute = raw_data$`Batch-norm Imputed Data`
-raw_data_log = raw_data$`Log Transformed Data`
 sample_names = substr(raw_data$`Sample Meta Data`$CLIENT_SAMPLE_ID, 1, 9) 
-rownames(raw_data_peak) = sample_names 
 rownames(raw_data_batch) = sample_names
-rownames(raw_data_impute) = sample_names
-rownames(raw_data_log) = sample_names
-raw_data_peak = raw_data_peak[, -1]
 raw_data_batch = raw_data_batch[, -1]
-raw_data_impute = raw_data_impute[, -1]
-raw_data_log = raw_data_log[, -1]
-raw_data_ls = list(peak = raw_data_peak,
-                   batch = raw_data_batch,
-                   impute = raw_data_impute,
-                   log = raw_data_log)
+raw_data_ls = list(batch = raw_data_batch)
 
 meta_impute_new = raw_data_ls$batch 
 for (chem_id in 1:ncol(meta_impute_new)) { 
@@ -966,7 +914,6 @@ for (chem_id in 1:ncol(meta_impute_new)) {
   meta_impute_new[is.na(old_values), chem_id] = min(old_values, na.rm = T) / 2 
 }
 meta_final = log(meta_impute_new) 
-meta_final_METABOLON = raw_data_ls$log 
 
 
 sample_data = raw_data$`Sample Meta Data` 
@@ -974,7 +921,6 @@ rownames(sample_data) = sample_data$PARENT_SAMPLE_NAME
 chem_annotation = raw_data$`Chemical Annotation` 
 rownames(chem_annotation) = paste0('CHEM_', chem_annotation$CHEM_ID) 
 colnames(meta_final) = paste0('CHEM_', colnames(meta_final)) 
-colnames(meta_final_METABOLON) = paste0('CHEM_', colnames(meta_final_METABOLON)) 
 
 
 chem_annotation$missing_rate = colMeans(is.na(raw_data_ls$batch)) 
@@ -992,7 +938,7 @@ for (d_id in 1:nrow(chem_annotation)) {
 chem_to_keep = rownames(chem_annotation)[ which(chem_annotation$missing_rate <= 0.7) ] 
 meta_final_full = meta_final 
 meta_final = meta_final[, chem_to_keep] 
-meta_final_METABOLON = meta_final_METABOLON[, chem_to_keep]
+# meta_final_METABOLON = meta_final_METABOLON[, chem_to_keep]
 
 META_pat_vec = rownames(meta_final) 
 n_sam_vec = unlist(sapply(full_long_ls[ META_pat_vec ], nrow)) 
@@ -1122,6 +1068,8 @@ for (comp_id in 1:5) {
     
     
   } else if (comp_id >= 2) { 
+    
+    ancom_model_fit = NULL
     
     library(ANCOMBC)
     CURRENT_DATA = as.data.frame( t(Genus_ct_tab[full_long_3T$sample_id, ]) ) 
